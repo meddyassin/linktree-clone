@@ -1,0 +1,40 @@
+ <div
+                    className="links"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {appData &&
+                      appData
+                        .slice(1)
+                        .map((link, index) => (
+                          <Draggable
+                            key={link.id}
+                            draggableId={link.id.toString()}
+                            index={index}
+                          >
+                            {(provided, snapshot) => {
+                              return (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <Link
+                                    key={link.id}
+                                    id={link.id}
+                                    order={link.order}
+                                    visible={link.visible}
+                                    url={link.url}
+                                    title={link.title}
+                                    prioritize={link.prioritize}
+                                    lock={link.lock}
+                                    analytics={link.analytics}
+                                  />
+                                </div>
+                              );
+                            }}
+                          </Draggable>
+                        ))
+                        .sort((a, b) => (a.price > b.price ? 1 : -1))}
+                        {provided.placeholder}
+                  </div>
