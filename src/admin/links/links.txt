@@ -1,3 +1,7 @@
+ some stupid things I did
+ I was thinking for no reason that I need an id by numbers
+ this waisted me 2 days
+ 
  <div
                     className="links"
                     {...provided.droppableProps}

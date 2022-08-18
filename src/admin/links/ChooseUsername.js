@@ -27,13 +27,13 @@ function ChooseUsername() {
     ) {
       firebase
         .database()
-        .ref(localStorage.getItem("this_uid") + "/" + "1")
+        .ref(localStorage.getItem("this_uid") + "/" + "user_info_section_2")
         .set({
           username: theUsername,
         });
       firebase
         .database()
-        .ref(theUsername + "/" + "0")
+        .ref(theUsername + "/" + "user_info")
         .set({
           username: theUsername,
           uid: dataCenter[0].uid,

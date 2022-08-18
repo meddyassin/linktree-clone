@@ -5,7 +5,6 @@
 // possible bug: what if a user calls himself undenified
 
 // minimalist store possible bug: a user can add to cart only if his uid is in the database
-
 import { Switch, Tooltip } from "@chakra-ui/react";
 import firebase from "../../firebase/firebase";
 import { dataContext } from "../../contexts/dataContext";
@@ -97,54 +96,88 @@ const deleteIcon = (
   </svg>
 );
 
-function Link({ id, visible, url, title, prioritize, lock, analytics, counter }) {
+function Link({ keyyy, id, isDeleted, isVisible, url, title, prioritize, lock, analytics}) {
+
   const { appData } = useContext(dataContext);
 
-  function handleVisibility() {
-    console.log("handle visibilitiy");
+  /* -------------------------------------------------- */
+
+  function handleSwitch() {
+    appData && 
+    firebase
+    .database()
+    .ref(appData[0].username + "/user_links" + "/" + keyyy + "/isVisible")
+    .set(!isVisible)
   }
+  
+  /* -------------------------------------------------- */
 
   function prioritizeLink() {
     console.log("prioritize link");
   }
 
+  /* -------------------------------------------------- */
+
   function lockLink() {
     console.log("lock link");
   }
+
+  /* -------------------------------------------------- */
 
   function showButtonAnaylitcs() {
     console.log("show button analytics");
   }
 
+  /* -------------------------------------------------- */
+
+  let dbLinksArray = [];
+  const [linksArray, updateLinksArray] = useState(dbLinksArray);
+
+  useEffect(() => {
+    appData 
+    && (appData[1] ? appData.map((item) => item.id === 'user_links' && updateLinksArray(Object.values(item).slice(0,-1))) : updateLinksArray([]))
+
+  }, [appData])
+
   function removeLink() {
-    appData && firebase
+   (appData[1] && linksArray && linksArray.length > 0) ? linksArray.splice(keyyy, 1) : linksArray.length = 0
+    appData &&
+    firebase
       .database()
-      .ref(appData[appData.length - 1].username + "/" + id)
-      .remove();
+      .ref(appData[0].username + "/" + "user_links")
+      .set(linksArray)
   }
+  
+  /* -------------------------------------------------- */ 
 
   const [newTitle, setNewTitle] = useState(title);
   const [newUrl, setNewUrl] = useState(url);
 
-  useEffect(() => {
+  function handleNewTitle(value) {
+    setNewTitle(value)
     const delayDebounceFn = setTimeout(() => {
-      appData && counter &&
-        firebase
-          .database()
-          .ref(appData[appData.length - 1].username + "/" + counter)
-          .set({
-            title: newTitle,
-            url: newUrl,
-            counter: counter,
-            id: id,
-            prioritize: prioritize,
-            lock: newUrl,
-            analytics: "analytics",
-          });
-    }, 100);
-
+      appData && 
+      firebase
+      .database()
+      .ref(appData[0].username + "/user_links" + "/" + keyyy + "/title")
+      .set(value)
+    }, 100)
     return () => clearTimeout(delayDebounceFn);
-  }, [newTitle, newUrl]);
+  }
+
+  function handleNewUrl(value) {
+    setNewUrl(value)
+    const delayDebounceFn = setTimeout(() => {
+      appData && 
+      firebase
+      .database()
+      .ref(appData[0].username + "/user_links" + "/" + keyyy + "/url")
+      .set(value)
+    }, 100)
+    return () => clearTimeout(delayDebounceFn);
+  }
+
+  /* -------------------------------------------------- */
 
   return (
     <div className="link">
@@ -156,19 +189,19 @@ function Link({ id, visible, url, title, prioritize, lock, analytics, counter })
               <input
                 type="text"
                 value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
+                onChange={(e) => handleNewTitle(e.target.value)}
               />
             </div>
             <div>
               <input
                 type="text"
                 value={newUrl}
-                onChange={(e) => setNewUrl(e.target.value)}
+                onChange={(e) => handleNewUrl(e.target.value)}
               />
             </div>
           </div>
           <div>
-            <Switch colorScheme="green" onChange={handleVisibility} />
+            <Switch colorScheme="green" isChecked={isVisible} onChange={handleSwitch} />
           </div>
         </div>
         <div className="link_properties_container">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import uuid from 'react-uuid';
 import { authContext } from "../../contexts/authContext";
 import { dataContext } from "../../contexts/dataContext";
 import firebase from "../../firebase/firebase";
@@ -24,14 +25,14 @@ function Links() {
 
   // getting the states from context
   const { email, uid, displayName, photoURL } = useContext(authContext);
-  const { dataCenter, appData} = useContext(dataContext);
+  const { dataCenter, appData } = useContext(dataContext);
 
   // storing the uid/name/email/photoURL each time the user sign
   useEffect(() => {
     if (email && uid) {
       firebase
         .database()
-        .ref(`${localStorage.getItem("this_uid")}/0`)
+        .ref(`${localStorage.getItem("this_uid")}/user_info_section_1`)
         .set({
           uid: uid,
           displayName: displayName,
@@ -41,89 +42,90 @@ function Links() {
     }
   }, [email, uid, displayName, photoURL]);
 
+  // reordering lists, storing link coming from appData in linksArray
+  let dbLinksArray = [];
+  const [linksArray, updateLinksArray] = useState(dbLinksArray);
 
-  // const arrayToFindLastId = []
-  // appData && appData.slice(1).map((link) => arrayToFindLastId.push(link.id))
-  // arrayToFindLastId.length > 0 && console.log(arrayToFindLastId[arrayToFindLastId.length - 1])
-
-  // const arrayToFindLastCount = []
-  // appData && appData.slice(1).map((link) => arrayToFindLastCount.push(link.counter))
-  // arrayToFindLastCount.length > 0 && console.log(arrayToFindLastCount)
+  // is is one hundred percent clearn that the problem is here
+  // I only get the date from here if appData[1] exist, which exist pretty slowly
+  useEffect(() => {
+    appData 
+    && (appData[1] ? 
+      appData.map((item) => item.id === 'user_links' 
+      && updateLinksArray(Object.values(item).slice(0,-1))) 
+      : (appData[0].uid && updateLinksArray([])))
+    appData && console.log(appData)
+  }, [appData])
   
+  // storing the new order in linksArray & triggering effect  
+  const [triggerEffect, setTriggerEffect] = useState(0)
 
-  appData && console.log(appData)
+  function handleOnDragEnd(result) {
+    if (!result.destination) return;
+
+    const items = Array.from(linksArray)
+    const [reorderedItem] = items.splice(result.source.index, 1)
+    items.splice(result.destination.index, 0, reorderedItem)
+
+    updateLinksArray(items);
+
+    setTriggerEffect(triggerEffect + 1)
+  }
  
-  // adding links
+
+  // this code will trigger if appData is loaded or not
+  // if app data is loaded triggerEffect2 will be true
+  // we need this so that the second useEffect will only run
+  // if there is something in appData
+  const [triggerEffect2, setTriggerEffect2] = useState(false)
+  useEffect(() => {
+    setTriggerEffect2(true)
+  }, [appData])
+
+  useEffect(() => {
+    appData && triggerEffect2 &&
+    firebase
+      .database()
+      .ref(appData[0].username + "/" + "user_links")
+      .set(linksArray)
+    console.log(triggerEffect)
+    appData && console.log(appData)
+    console.log(linksArray)
+  }, [triggerEffect]);  
+
+
   function addLink() {
-    appData && 
-      firebase
-        .database()
-        .ref(appData[appData.length - 1].username + "/" + 3)
-        .set({
-          title: "title",
-          url: "url",
-          id: 3,
-          counter: 3,
-          prioritize: false,
-          lock: false,
-          analytics: "analytics",
-        });
-    // when a user clicks on add a link, we will sort the appData array
+    // in the testingArray, there are two things
+    // the new object that we wanna add
+    // the second object the if exist = good
+    // if it does not, not adding anything
+    const newLink = [{
+      title: "title",
+      url: "url",
+      id: uuid(),
+      prioritize: false,
+      lock: false,
+      analytics: "analytics",
+      isVisible: true,
+      isDeleted: false,
+    }]
+
+    // const testingArray = (linksArray && linksArray.length > 0) ? newLink.concat(linksArray) : newLink
+    const testingArray = newLink.concat(linksArray)
+
+    linksArray && 
+    firebase
+      .database()
+      .ref(appData[0].username + "/" + "user_links")
+      .set(testingArray)
+    
+      console.log("i fucked you yassin, I runed this function") 
   }
 
   // adding text, youtube, twitter
   function explore() {
     console.log(explore);
   }
-
-  // reordering lists, storing link coming from appData in linksArray
-  let dbLinksArray = [];
-  const [linksArray, updateLinksArray] = useState(dbLinksArray);
-
-  useEffect(() => {
-    dbLinksArray = appData && appData.splice(0, appData.length-1)
-    updateLinksArray(dbLinksArray);
-  }, [appData]);
-
-  const [triggerEffect, setTriggerEffect] = useState(0);
-  // the new organised array is stored in linksArray
-  
-  function handleOnDragEnd(result) {
-    if (!result.destination) return;
-
-    const items = Array.from(linksArray)
-    const [reorderedItem] = items.splice(result.source.index, 1)
-
-    items.splice(result.destination.index, 0, reorderedItem)
-
-    updateLinksArray(items.reverse());
-
-    setTriggerEffect(triggerEffect + 1);
-  }
-
-
-  // this function now store everything in firebase
-  let counter = 0;
-  useEffect(() => {
-    appData &&
-      linksArray &&
-      linksArray.length >= 1 &&
-      linksArray.map((link) => {
-        counter = counter + 1;
-        firebase
-          .database()
-          .ref(appData[appData.length - 1].username + "/" + counter)
-          .set({
-            title: appData && link.title,
-            url: appData && link.url,
-            counter: counter,
-            id: appData && link.id,
-            prioritize: false,
-            lock: false,
-            analytics: "analytics",
-          });
-      });
-  }, [triggerEffect]);
 
   // UI UI UI UI UI UI UI UI UI UI
   if (dataCenter && dataCenter.length == 2) {
@@ -167,14 +169,10 @@ function Links() {
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                 >
-                  {appData &&
-                    linksArray &&
-                    linksArray.length >= 1 && 
+                  {linksArray && 
                     linksArray.map(
                       (
                         {
-                          key,
-                          counter,
                           id,
                           visible,
                           url,
@@ -182,6 +180,8 @@ function Links() {
                           prioritize,
                           lock,
                           analytics,
+                          isVisible,
+                          isDeleted,
                         },
                         index
                       ) => {
@@ -198,15 +198,15 @@ function Links() {
                                 {...provided.dragHandleProps}
                               >
                                 <Link
-                                  key={id}
+                                  keyyy={index}
                                   id={id}
-                                  counter={counter}
-                                  visible={visible}
                                   url={url}
                                   title={title}
                                   prioritize={prioritize}
                                   lock={lock}
                                   analytics={analytics}
+                                  isVisible={isVisible}
+                                  isDeleted={isDeleted}
                                 />
                               </div>
                             )}

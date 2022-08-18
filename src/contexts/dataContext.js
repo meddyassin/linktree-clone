@@ -35,7 +35,7 @@ function DataContextProvider({children}) {
        const snapshotVal = snapshot.val();
        const appData = [];
        for (let id in snapshotVal) {
-         appData.unshift({ id, ...snapshotVal[id] }) 
+         appData.push({ id, ...snapshotVal[id] }) 
        }
        setappData(appData)
       });

@@ -1,11 +1,11 @@
 // I wanna play the long term game
-// I wanna make a career out of software dev 
-// for the next 7 years at least 
+// I wanna make a career out of software dev
+// for the next 7 years at least
 // I wanna try everything, learn new things and master the basics
 // 7 years from now I'll turn 30, a lot of things may change by that time
 
 // things I don't understand in linktree
-// the layout will break down at width 800px 
+// the layout will break down at width 800px
 // they are pretty slow
 
 // how I made the linktree clone in just one day!
@@ -18,27 +18,26 @@
 // each use has his own array of data
 // this array is organised by number
 // number 0 => contains the basic info that I get from google auth
-// number 1 => contains his customisation of the page 
+// number 1 => contains his customisation of the page
 // number 2 to infinity => contains the links of the user and their properties
 
 // tell your father the following
 // this is my facebook
 // let us go the carthage airport
-// take a picture 
+// take a picture
 // image what 3am moncef will say
 // sabra, fatma, they all will see this pic on my facebook
 // my old friends also
-// the ppl who laughed at me 
+// the ppl who laughed at me
 // this will provide me with a new amazing start
 
 // your sisters must be saying .. haha look at his son, he is a failure
-// and then sandnly, I'll appear at the airport 
+// and then sandnly, I'll appear at the airport
 
 // try as hard as you can so that you can send an invite to sabra
 
 // yakha na bach marbout ? ijam3a bach rabtitni ? ichhada kifah na marbout biha ?
 // najm min 8odwa b9arar bark nasb7 fi dubai
-
 
 // to fix
 // if a user changes things in localStorage
@@ -46,21 +45,34 @@
 // if localStorage contains ] or things like that it won't work
 
 // change the name of the copied className to an other name of your own
-import { Button } from '@chakra-ui/react'
-import { useContext } from "react"
-import { authContext } from "./contexts/authContext"
-import { Link } from "react-router-dom"
+import { Button } from "@chakra-ui/react";
+import { useContext } from "react";
+import { authContext } from "./contexts/authContext";
+import { Link } from "react-router-dom";
+import { dataContext } from "./contexts/dataContext";
 
 function Home() {
-    const {signInWithGoogle} = useContext(authContext)
+  const { signInWithGoogle } = useContext(authContext);
+  const { appData } = useContext(dataContext);
 
-    return (
-        <div>
-            <Link to="/admin">
-                <Button colorScheme='blue' onClick={signInWithGoogle}>Log in with google</Button>
-            </Link>
-        </div>
-    )
+  // when a user clicks on continue to admin
+  // there will be a function that will
+  appData && console.log(appData[0].uid);
+  return (
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      {appData && appData[0].uid ? (
+        <Link to="/admin">
+            <Button>continue to admin</Button>
+        </Link>
+      ) : (
+        <Link to="/admin">
+          <Button colorScheme="blue" onClick={signInWithGoogle}>
+            Log in with google
+          </Button>
+        </Link>
+      )}
+    </div>
+  );
 }
 
-export default Home
+export default Home;
