@@ -30,6 +30,7 @@ function Phone() {
       <User
         photoURL={infoArray && infoArray.length > 0 && infoArray[0].photoURL}
         displayName={infoArray && infoArray.length > 0 && infoArray[0].displayName}
+        uid={infoArray && infoArray.length > 0 && infoArray[0].uid}
         links={linksArray && linksArray[0]}
         backgroundStyle={stylesArray}
         socialIcons={settingsArray}

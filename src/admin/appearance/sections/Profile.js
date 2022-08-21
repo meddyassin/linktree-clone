@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import firebase, { storage } from "../../../firebase/firebase";
-import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, listAll, ref, uploadBytes, deleteObject } from "firebase/storage";
 import { dataContext } from "../../../contexts/dataContext";
 import {
   Button,
@@ -12,8 +12,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
+  Spinner,
 } from "@chakra-ui/react";
-import uuid from "react-uuid";
 import "../Appearance.css";
 
 function Profile() {
@@ -66,42 +66,72 @@ function Profile() {
     setIsOpen(true);
   }
 
+  const imageRef = appData && ref(storage, `${appData[0].username + "/profilePhoto"}`);
+
   const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState('')
+  const [imageUrl, setImageUrl] = useState();
+  const [trigger, setTrigger] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   function handleUploadImage() {
-    const imageRef =
-      appData && ref(storage, `${appData[0].username + "/profilePhoto"}`);
-    appData &&
-      uploadBytes(imageRef, image).then(() => {
-        listAll(ref(storage, appData[0].username)).then((response) => {
-          response.items.forEach((item) => {
-            getDownloadURL(item).then((url) => {
-              setImageUrl(url)
-            })
-          })
-        })
-      }).then(() => {
-        firebase
-          .database()
-          .ref(appData[0].uid + "/user_info_section_1" + "/" + "photoURL")
-          .set(imageUrl) &&
-        firebase
-        .database()
-        .ref(appData[0].username + "/user_info" + "/" + "photoURL")
-        .set(imageUrl);
-      })
+    if (image) {
+      setIsLoading(true);
+      appData &&
+        uploadBytes(imageRef, image).then(() => {
+          listAll(ref(storage, appData[0].username)).then((response) => {
+            response.items.forEach((item) => {
+              getDownloadURL(item).then((url) => {
+                setImageUrl(url);
+                setTrigger(trigger + 1);
+              });
+            });
+          });
+        });
+    } else {
+      alert("hi");
+    }
   }
 
-  console.log(imageUrl)
+  const [isLoading2, setIsLoading2] = useState(false);
+  function handleRemove() {
+    setIsLoading2(true);
+    setTrigger(trigger + 1);
+    deleteObject(imageRef).then(() => {
+      // File deleted successfully
+    })
+    setImageUrl("---")
+  }
+
+  useEffect(() => {
+    appData &&
+      imageUrl &&
+      firebase
+        .database()
+        .ref(appData[0].uid + "/user_info_section_1" + "/" + "photoURL")
+        .set(imageUrl) &&
+      firebase
+        .database()
+        .ref(appData[0].username + "/user_info" + "/" + "photoURL")
+        .set(imageUrl) &&
+      setIsLoading(false);
+    setIsLoading2(false);
+    setIsOpen(false);
+    console.log("triggered");
+  }, [appData && trigger]);
+
 
   return (
     <div className="section_container">
       <div className="profile_image_settings_container">
         <div className="profile_image_settings_image">
-          {appData && appData[0].photoURL ? (
-            <img style={{ borderRadius: "50%" }} src={appData[0].photoURL} />
+          {appData && appData[0].photoURL !== "---" ? (
+            <img
+              style={{ width: "80px", height: "80px", borderRadius: "50%" }}
+              src={appData[0].photoURL}
+            />
+          ) : appData && appData[0].photoURL === "---" ? (
+            <div style={{width: "80px", height: "80px", borderRadius: "50%", background: "lightgray"}}></div>
           ) : (
-            "loading spiner"
+            <Spinner color="purple" />
           )}
         </div>
         <div className="profile_image_settings_buttons">
@@ -120,13 +150,28 @@ function Profile() {
               <ModalBody>
                 <Input
                   type="file"
+                  accept="image/*"
                   onChange={(e) => setImage(e.target.files[0])}
                 />
-                <Button onClick={handleUploadImage}>Upload Image</Button>
+                <Button
+                  isLoading={isLoading}
+                  colorScheme="purple"
+                  onClick={handleUploadImage}
+                  spinner={<Spinner color="white" />}
+                >
+                  upload
+                </Button>
               </ModalBody>
             </ModalContent>
           </Modal>
-          <Button borderRadius="44px">Remove</Button>
+          <Button
+            borderRadius="44px"
+            isLoading={isLoading2}
+            onClick={handleRemove}
+            spinner={<Spinner />}
+          >
+            Remove
+          </Button>
         </div>
       </div>
       <Input

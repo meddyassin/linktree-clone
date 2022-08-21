@@ -27,3 +27,48 @@
     margin: 15px auto;
     width: 100%;
 }
+
+.local_social_icons_container {
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 0.5px solid gainsboro;
+    border-radius: 10px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.icon {
+    width: 10%;
+    margin-left: 11px;
+}
+
+.website {
+    width: 80%;
+    margin-left: -4px;
+}
+
+.arrow {
+    width: 10%;
+    height: 15px;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 6px;
+}
+
+.add_to_linktree_container {
+    padding: "12px 24px 40px 14px";
+    display: flex;
+    flex-direction: column;
+}
+
+.add_to_linktree_message {
+    margin-bottom: 10px
+}
+
+.add_to_linktree_button {
+    margin-top: 25px;
+    margin-bottom: 20px;
+}

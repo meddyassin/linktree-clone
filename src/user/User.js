@@ -7,7 +7,7 @@ function User({ photoURL, displayName, uid, links, viewType }) {
     }
   }
 
-  if (photoURL) {
+  if (uid) {
     return (
       <div
         className="user_uu bg"

@@ -9,10 +9,14 @@
     display: flex;
     justify-content: space-evenly;
     padding: 16px;
+    height: 130px;
 }
 
 .profile_image_settings_image {
     width: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .profile_image_settings_buttons {
