@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import uuid from 'react-uuid';
+import uuid from "react-uuid";
 import { authContext } from "../../contexts/authContext";
 import { dataContext } from "../../contexts/dataContext";
 import firebase from "../../firebase/firebase";
@@ -29,97 +29,92 @@ function Links() {
 
   // storing the uid/name/email/photoURL each time the user sign
   useEffect(() => {
-    if (email && uid) {
+    if (uid && email) {
       firebase
         .database()
         .ref(`${localStorage.getItem("this_uid")}/user_info_section_1`)
         .set({
           uid: uid,
-          displayName: displayName,
+          displayName: appData ? appData[0].displayName : displayName,
+          bio: appData ? appData[0].bio : "",
           email: email,
-          photoURL: photoURL,
+          photoURL: appData ? appData[0].photoURL : photoURL,
         });
     }
   }, [email, uid, displayName, photoURL]);
 
-  // reordering lists, storing link coming from appData in linksArray
+  // storing the links coming from appData in linksArray
   let dbLinksArray = [];
   const [linksArray, updateLinksArray] = useState(dbLinksArray);
 
   // is is one hundred percent clearn that the problem is here
   // I only get the date from here if appData[1] exist, which exist pretty slowly
+  // isAppDataLoaded state will trigger if appData is loaded or not
+  // if app data is loaded triggerEffect2 will be true
+  // we need this so that the second useEffect will only run
+  // if there is something in appData
+  const [isAppDataLoaded, setIsAppDataLoaded] = useState(false);
   useEffect(() => {
-    appData 
-    && (appData[1] ? 
-      appData.map((item) => item.id === 'user_links' 
-      && updateLinksArray(Object.values(item).slice(0,-1))) 
-      : (appData[0].uid && updateLinksArray([])))
-    appData && console.log(appData)
-  }, [appData])
-  
-  // storing the new order in linksArray & triggering effect  
-  const [triggerEffect, setTriggerEffect] = useState(0)
+    appData &&
+      (appData.filter((item) => item.id === 'user_links')[0]
+        ? appData.map(
+            (item) =>
+              item.id === "user_links" &&
+              updateLinksArray(Object.values(item).slice(0, -1))
+          )
+        : appData[0].uid && updateLinksArray([]));
+    setIsAppDataLoaded(true);
+    // I need this later
+    // appData && console.log(appData.filter((item) => item.id === 'user_links'))
+    // appData && console.log(appData[1])
+    // appData && console.log(appData.filter((item) => item.id === 'user_links')[0])
+  }, [appData]);
+
+  // storing the new order in linksArray & triggering effect
+  const [triggerEffect, setTriggerEffect] = useState(0);
 
   function handleOnDragEnd(result) {
     if (!result.destination) return;
 
-    const items = Array.from(linksArray)
-    const [reorderedItem] = items.splice(result.source.index, 1)
-    items.splice(result.destination.index, 0, reorderedItem)
+    const items = Array.from(linksArray);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
 
     updateLinksArray(items);
 
-    setTriggerEffect(triggerEffect + 1)
+    setTriggerEffect(triggerEffect + 1);
   }
- 
-
-  // this code will trigger if appData is loaded or not
-  // if app data is loaded triggerEffect2 will be true
-  // we need this so that the second useEffect will only run
-  // if there is something in appData
-  const [triggerEffect2, setTriggerEffect2] = useState(false)
-  useEffect(() => {
-    setTriggerEffect2(true)
-  }, [appData])
 
   useEffect(() => {
-    appData && triggerEffect2 &&
-    firebase
-      .database()
-      .ref(appData[0].username + "/" + "user_links")
-      .set(linksArray)
-    console.log(triggerEffect)
-    appData && console.log(appData)
-    console.log(linksArray)
-  }, [triggerEffect]);  
-
+    appData &&
+      isAppDataLoaded &&
+      firebase
+        .database()
+        .ref(appData[0].username + "/" + "user_links")
+        .set(linksArray);
+  }, [triggerEffect]);
 
   function addLink() {
-    // in the testingArray, there are two things
-    // the new object that we wanna add
-    // the second object the if exist = good
-    // if it does not, not adding anything
-    const newLink = [{
-      title: "title",
-      url: "url",
-      id: uuid(),
-      prioritize: false,
-      lock: false,
-      analytics: "analytics",
-      isVisible: true,
-      isDeleted: false,
-    }]
+    const newLink = [
+      {
+        title: "title",
+        url: "url",
+        id: uuid(),
+        prioritize: false,
+        lock: false,
+        analytics: "analytics",
+        isVisible: true,
+        isDeleted: false,
+      },
+    ];
 
-    // const testingArray = (linksArray && linksArray.length > 0) ? newLink.concat(linksArray) : newLink
-    const testingArray = newLink.concat(linksArray)
+    const testingArray = newLink.concat(linksArray);
 
-    linksArray && 
-    firebase
-      .database()
-      .ref(appData[0].username + "/" + "user_links")
-      .set(testingArray)
-    
-      console.log("i fucked you yassin, I runed this function") 
+    linksArray &&
+      firebase
+        .database()
+        .ref(appData[0].username + "/" + "user_links")
+        .set(testingArray);
   }
 
   // adding text, youtube, twitter
@@ -169,7 +164,7 @@ function Links() {
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                 >
-                  {linksArray && 
+                  {linksArray &&
                     linksArray.map(
                       (
                         {

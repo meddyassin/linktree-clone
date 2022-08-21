@@ -3,6 +3,8 @@ import Nav1 from "../../components/nav1/Nav1"
 import Nav2 from "../../components/nav2/Nav2"
 import Nav3 from "../../components/nav3/Nav3"
 import Phone from "../../components/phone/Phone"
+import SocialIcons from "./SocialIcons"
+
 import {
   Drawer,
   DrawerBody,
@@ -21,7 +23,9 @@ function Settings() {
         <div className="item2"><Nav2 /></div>
         <div className="item3"><Nav3 /></div>
         <div className="item4">
-          Settings
+          <h2>social Icons</h2>
+          <p>display links to your social profiles, with linktree. clone</p>
+          <SocialIcons />
         </div>
         <div className="item5"><Phone /></div>
         <div className="see_page">

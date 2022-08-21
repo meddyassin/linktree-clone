@@ -25,6 +25,7 @@ function ChooseUsername() {
       dataCenter &&
       theUsername.match("^[A-Za-z0-9_]+$")
     ) {
+
       firebase
         .database()
         .ref(localStorage.getItem("this_uid") + "/" + "user_info_section_2")
@@ -38,6 +39,7 @@ function ChooseUsername() {
           username: theUsername,
           uid: dataCenter[0].uid,
           displayName: dataCenter[0].displayName,
+          bio: dataCenter[0].bio,
           photoURL: dataCenter[0].photoURL,
           email: dataCenter[0].email,
         }) &&

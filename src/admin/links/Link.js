@@ -124,7 +124,7 @@ function Link({ keyyy, id, isDeleted, isVisible, url, title, prioritize, lock, a
 
   /* -------------------------------------------------- */
 
-  function showButtonAnaylitcs() {
+  function showAnaylitcs() {
     console.log("show button analytics");
   }
 
@@ -135,12 +135,12 @@ function Link({ keyyy, id, isDeleted, isVisible, url, title, prioritize, lock, a
 
   useEffect(() => {
     appData 
-    && (appData[1] ? appData.map((item) => item.id === 'user_links' && updateLinksArray(Object.values(item).slice(0,-1))) : updateLinksArray([]))
+    && (appData.filter((item) => item.id === 'user_links')[0] ? appData.map((item) => item.id === 'user_links' && updateLinksArray(Object.values(item).slice(0,-1))) : updateLinksArray([]))
 
   }, [appData])
 
   function removeLink() {
-   (appData[1] && linksArray && linksArray.length > 0) ? linksArray.splice(keyyy, 1) : linksArray.length = 0
+   (appData.filter((item) => item.id === 'user_links')[0] && linksArray && linksArray.length > 0) ? linksArray.splice(keyyy, 1) : linksArray.length = 0
     appData &&
     firebase
       .database()
@@ -212,7 +212,7 @@ function Link({ keyyy, id, isDeleted, isVisible, url, title, prioritize, lock, a
             <div className="link_propertie" onClick={lockLink}>
               <Tooltip label="Lock">{lockIcon}</Tooltip>
             </div>
-            <div className="link_propertie" onClick={showButtonAnaylitcs}>
+            <div className="link_propertie" onClick={showAnaylitcs}>
               <Tooltip label="Anaylitcs">
                 <div style={{ marginRight: "4px" }}>{staticsIcon}</div>
               </Tooltip>

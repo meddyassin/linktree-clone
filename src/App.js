@@ -2,8 +2,8 @@ import Links from './admin/links/Links'
 import Appearance from './admin/appearance/Appearance'
 import Settings from './admin/settings/Settings'
 import Analytics from './admin/analytics/Analytics'
+import UserContainer from './user/UserContainer'
 import Home from './Home'
-import User from './User'
 import { Routes, Route } from "react-router-dom"
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
       <Route path="/admin/appearance" element={<Appearance />} />
       <Route path="/admin/settings" element={<Settings />} />
       <Route path="/admin/analytics"element={<Analytics />} />
-      <Route path=":id" element={<User />} />
+      <Route path=":id" element={<UserContainer />} />
     </Routes>
   );
 }
