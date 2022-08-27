@@ -1,0 +1,206 @@
+const localSocialIconsArray = [
+    {
+      id: 1,
+      icon: facebookIcon,
+      website: "Facebook",
+    },
+    {
+      id: 2,
+      icon: instagramIcon,
+      website: "Instagram",
+    },
+    {
+      id: 3,
+      icon: linkedinIcon,
+      website: "Linkedin",
+    },
+    {
+      id: 4,
+      icon: tiktokIcon,
+      website: "Tiktok",
+    },
+    {
+      id: 5,
+      icon: twitterIcon,
+      website: "Twitter",
+    },
+    {
+      id: 6,
+      icon: youtubeIcon,
+      website: "Youtube",
+    },
+  ];
+
+  const [userSocialMediaUsername, setUserSocialMediaUsername] = useState("");
+  const [typingMessage, setTypingMessage] = useState("");
+  const [isActive, setIsActive] = useState(false);
+
+  function linksIsInvalid() {
+    setTypingMessage(
+      "plz enter a valid Linkedin route, link should be /in/your-username"
+    );
+    setIsActive(false);
+  }
+
+  function linkIsReady() {
+    setTypingMessage("");
+    setIsActive(true);
+  }
+
+  function linkIsLong() {
+    setTypingMessage("link seems too long");
+    setIsActive(false);
+  }
+
+  function linkIsEmpty() {
+    setTypingMessage("");
+    setIsActive(false);
+  }
+
+  function handleChange(value) {
+    setUserSocialMediaUsername(value);
+    if (
+      clickedSocialIcon === "Facebook" ||
+      clickedSocialIcon === "Instagram" ||
+      clickedSocialIcon === "Twitter"
+    ) {
+      value && (value.length < 2 || value[0] !== "@")
+        ? setTypingMessage("plz")
+        : setTypingMessage("");
+    }
+    if (clickedSocialIcon === "Tiktok") {
+      value && (value.length < 2 || value[0] !== "@")
+        ? setTypingMessage(
+            "please enter a valid" +
+              { clickedSocialIcon } +
+              "route, link should be @your username"
+          )
+        : setTypingMessage("");
+    }
+    if (clickedSocialIcon === "Linkedin") {
+      value && (value.length < 4 || value[0] + value[1] + value[2] !== "in/")
+        ? linksIsInvalid()
+        : value.length >= 4 && value.length < 20
+        ? linkIsReady()
+        : value.length >= 20
+        ? linkIsLong()
+        : linkIsEmpty();
+    }
+    if (clickedSocialIcon === "Youtube") {
+      value && (value.length < 3 || value[0] + value[1] !== "c/")
+        ? setTypingMessage("plz")
+        : setTypingMessage("");
+    }
+  }
+
+  function closeModal() {
+    // setIsOpen(false);
+    setClickedSocialIcon();
+    setTypingMessage("");
+    setUserSocialMediaUsername("");
+    setIsActive(false);
+  }
+
+  function handleBackButton() {
+    setClickedSocialIcon();
+    setTypingMessage("");
+    setUserSocialMediaUsername("");
+    setIsActive(false);
+  }
+
+  const [clickedSocialIcon, setClickedSocialIcon] = useState();
+
+  console.log(isOpen)
+  return (
+    <Modal isOpen={isOpen} isCentered={true}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {clickedSocialIcon ? (
+            <div onClick={handleBackButton}>
+              <Button
+                colorScheme="white"
+                style={{
+                  padding: "0px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+                _hover={{ background: "#edf2f7" }}
+              >
+                {backIcon}
+              </Button>
+            </div>
+          ) : (
+            <span></span>
+          )}
+          <div>Add Icon</div>
+          <div className="close_icon" onClick={closeModal}>
+            <Button
+              colorScheme="white"
+              style={{
+                padding: "0px",
+                display: "flex",
+                justifyContent: "center",
+              }}
+              _hover={{ background: "#edf2f7" }}
+            >
+              {closeIcon}
+            </Button>
+          </div>
+        </ModalHeader>
+        <ModalBody>
+          {clickedSocialIcon ? (
+            <div className="add_to_linktree_container">
+              <p className="add_to_linktree_message">
+                Enter your {clickedSocialIcon} route
+              </p>
+              <Input
+                placeholder={
+                  clickedSocialIcon === "Facebook" ||
+                  clickedSocialIcon === "Instagram" ||
+                  clickedSocialIcon === "Twitter" ||
+                  clickedSocialIcon === "Tiktok"
+                    ? "@yoursername"
+                    : clickedSocialIcon === "Linkedin"
+                    ? "in/yourusername"
+                    : clickedSocialIcon === "Youtube"
+                    ? "c/yourusername"
+                    : ""
+                }
+                onChange={(e) => handleChange(e.target.value)}
+                value={userSocialMediaUsername}
+              />
+              <p>{typingMessage}</p>
+              <Button
+                className="add_to_linktree_button"
+                isActive={isActive}
+                isDisabled={!isActive}
+              >
+                Add to Linktree, clone
+              </Button>
+            </div>
+          ) : (
+            localSocialIconsArray.map((social) => {
+              return (
+                <div
+                  key={social.id}
+                  className="local_social_icons_container"
+                  onClick={() => setClickedSocialIcon(social.website)}
+                >
+                  <div className="icon">{social.icon}</div>
+                  <div className="website">{social.website}</div>
+                  <div className="arrow">{arrowIcon}</div>
+                </div>
+              );
+            })
+          )}
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+)

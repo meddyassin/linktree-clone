@@ -68,7 +68,32 @@
     margin-bottom: 10px
 }
 
+.typing_message {
+    color: red;
+}
+
 .add_to_linktree_button {
     margin-top: 25px;
     margin-bottom: 20px;
+}
+
+.social_icon {
+    display: flex;
+    background: white;
+}
+
+.social_icon .icon {
+    width: 10%;
+}
+
+.social_icon .website {
+    width: 70%;
+}
+
+.social_icon .switch {
+    width: 10%;
+}
+
+.social_icon .delete {
+    width: 10%;
 }
